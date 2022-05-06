@@ -19,13 +19,16 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
-
+ALLOWED_HOSTS = ['*']
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'postgres',
+        'USER': 'postgres',
+        'PASSWORD': 'postgres',
+        'HOST': 'db',
+        'PORT': 5432,
     }
 }
 
@@ -143,15 +146,15 @@ CELERY_RESULT_BACKEND = 'django-db'
 CELERY_BEAT_SCHEDULE = {
     "btc_usd": {
         "task": "crypto.tasks.update_bitcoin_price_usd",
-        "schedule": crontab(minute=35, hour='*'),
+        "schedule": crontab(minute=43, hour='*'),
     },
     "btc_pln": {
         "task": "crypto.tasks.update_bitcoin_price_pln",
-        "schedule": crontab(minute=25, hour='*'),
+        "schedule": crontab(minute=45, hour='*'),
     },
     "btc_eur": {
         "task": "crypto.tasks.update_bitcoin_price_eur",
-        "schedule": crontab(minute=37, hour='*'),
+        "schedule": crontab(minute=46, hour='*'),
     },
     "btc": {
         "task": "crypto.tasks.update_bitcoin_price_on_server",

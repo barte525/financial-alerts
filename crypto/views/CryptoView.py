@@ -10,7 +10,7 @@ class CryptoView(APIView):
         currency = request.GET.get('currency', '')
         if not name or not currency:
             return HttpResponse("Request does not contain all required query", status=400)
-        response = Asset.get_daily_change(name, currency)
+        response = Asset().get_new_crypto_price(name, currency)
         status = 200
         if type(response) == str:
             status = 400

@@ -61,7 +61,7 @@ class Asset(models.Model):
             asset = Asset.objects.get(name=name)
         except Asset.DoesNotExist:
             return NOT_EXIST_ERROR
-        price = self.get_new_crypto_price(asset, currency_code=currency_code)
+        price = self.get_new_crypto_price(name, currency_code=currency_code)
         if price != EXTERNAL_API_ERROR and price != NOT_EXIST_ERROR:
             self.set_asset_price(asset, currency_code, price)
             Alert().check_alert(asset, currency_code)
@@ -76,14 +76,14 @@ class Asset(models.Model):
             asset.converterUSD = price
         asset.save()
 
-    def get_new_crypto_price(self, asset, currency_code):
-        response = urlopen(self.crypto_url + '&ids=' + asset.name + '&convert=' + currency_code)
+    def get_new_crypto_price(self, name, currency_code):
+        response = urlopen(self.crypto_url + '&ids=' + name + '&convert=' + currency_code)
         if response.status != 200:
             return EXTERNAL_API_ERROR #add logging later
         data_table = json.loads(response.read())
         if not data_table:
             return NOT_EXIST_API_ERROR #add logging later
-        return data_table[0]['price']
+        return float(data_table[0]['price'])
 
     def update_asset_in_server(self, name):
         try:
