@@ -1,0 +1,1 @@
+main_currencies = ['USD', 'EUR', 'PLN']

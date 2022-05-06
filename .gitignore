@@ -1,0 +1,10 @@
+**/obj
+**/bin
+**/.DS_Store
+**/howmoney-volume
+**/venv
+crypto/data
+**/.idea
+**/__pycache__
+**/.env
+**/db.sqlite3
