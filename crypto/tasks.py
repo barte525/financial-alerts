@@ -20,11 +20,6 @@ def update_bitcoin_price_eur():
 
 
 @shared_task
-def update_bitcoin_price_on_server():
-    asset.update_asset_in_server('BTC')
-
-
-@shared_task
 def update_eth_price_usd():
     asset.update_asset_price('ETH', 'USD')
 
@@ -40,6 +35,16 @@ def update_eth_price_eur():
 
 
 @shared_task
-def update_eth_price_on_server():
-    asset.update_asset_in_server('ETH')
+def update_ltc_price_usd():
+    asset.update_asset_price('LTC', 'USD')
+
+
+@shared_task
+def update_ltc_price_pln():
+    asset.update_asset_price('LTC', 'PLN')
+
+
+@shared_task
+def update_ltc_price_eur():
+    asset.update_asset_price('LTC', 'EUR')
 

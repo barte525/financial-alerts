@@ -11,7 +11,7 @@ from django.db.models import Q
 
 class Alert(models.Model):
     alert_value = models.FloatField(null=False)
-    email = models.EmailField(null=False, max_length=254)
+    email = models.EmailField(max_length=254)
     currency = models.CharField(max_length=30)
     idA = models.ForeignKey(Asset, on_delete=models.CASCADE)
     alert_when_increases = models.BooleanField(default=True)

@@ -1,9 +1,13 @@
 from urllib.request import urlopen
+from urllib.parse import quote
+import urllib
 import json
 import requests
 from django.db import models
 from crypto.settings import env
 from django.db.utils import IntegrityError
+from bs4 import BeautifulSoup
+from crypto.models.consts import crypto_names
 NOT_EXIST_ERROR = "Crypto with that name and currency does not exist in database"
 EXTERNAL_API_ERROR = "External api did not send correct response"
 NOT_EXIST_API_ERROR = "Crypto with that name and currency does not exist in external API"
@@ -34,18 +38,8 @@ class Asset(models.Model):
                            converterEUR=100000.25, converterPLN=500000.25, converterUSD=110000.25)
         Asset.create_asset(guidA="4fa85f64-5717-4562-b3fc-2c963f66afa9", asset_type="crypto", name="ETH",
                            converterEUR=10, converterPLN=50, converterUSD=11)
-        Asset.create_asset(guidA="5fa85f64-5717-4562-b3fc-2c963f66afa9", asset_type="metal", name="GOLD",
-                           converterEUR=120, converterPLN=600, converterUSD=130)
-        Asset.create_asset(guidA="6fa85f64-5717-4562-b3fc-2c963f66afa9", asset_type="metal", name="SILVER",
-                           converterEUR=100000.25, converterPLN=500000.25, converterUSD=110000.25)
-        Asset.create_asset(guidA="7fa85f64-5717-4562-b3fc-2c963f66afa9", asset_type="currency", name="PLN",
-                           converterEUR=100000.25, converterPLN=500000.25, converterUSD=110000.25)
-        Asset.create_asset(guidA="8fa85f64-5717-4562-b3fc-2c963f66afa9", asset_type="currency", name="USD",
+        Asset.create_asset(guidA="4fa85f64-5717-4562-b3fc-2c963f66afa0", asset_type="crypto", name="LTC",
                            converterEUR=10, converterPLN=50, converterUSD=11)
-        Asset.create_asset(guidA="9fa85f64-5717-4562-b3fc-2c963f66afa9", asset_type="currency", name="EUR",
-                           converterEUR=120, converterPLN=600, converterUSD=130)
-        Asset.create_asset(guidA="2fa85f64-5717-4562-b3fc-2c963f66afa9", asset_type="currency", name="GBP",
-                           converterEUR=100000.25, converterPLN=500000.25, converterUSD=110000.25)
 
     @staticmethod
     def create_asset(guidA, asset_type, name, converterEUR, converterPLN, converterUSD):
@@ -100,4 +94,22 @@ class Asset(models.Model):
         }
         response = requests.put(self.server_url+asset.guidA, json=json_data, verify=False)
         return response
+
+    def scrap_info(self, name):
+        article_name = crypto_names.get(name, '')
+        article = quote(article_name)
+        opener = urllib.request.build_opener()
+        opener.addheaders = [('User-agent', 'Mozilla/5.0')]  # wikipedia needs this
+        resource = opener.open("http://en.wikipedia.org/wiki/" + article)
+        data = resource.read()
+        resource.close()
+        soup = BeautifulSoup(data)
+        parent = soup.find('div', id="mw-content-text")
+        if name != 'LTC':
+            text = str(parent.select("p:nth-of-type(2)"))
+        else:
+            text = str(parent.select("p:nth-of-type(1)"))
+        text = text[1:-1]
+        cleantext = BeautifulSoup(text, "lxml").text
+        return cleantext
 
